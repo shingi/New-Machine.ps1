@@ -1,9 +1,11 @@
 ﻿[CmdletBinding()]
 param (
     [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
     [string]
     $GitUserName,
     [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
     [string]
     $GitUserEmail)
 
@@ -36,24 +38,23 @@ if (-not ((Get-PackageSource -Name chocolatey).IsTrusted)) {
     "winmerge",
     "p4merge",
     "git.install",
-    "SublimeText3",
-    "SublimeText3.PackageControl",
     "fiddler4",
     "Jump-Location",
     "slack",
     "gitextensions",
-    "git-credential-manager-for-windows"
+    "git-credential-manager-for-windows",
+    "7zip"
 ) | % {
     Write-Progress -Activity "Installing $_"
     Install-Package -Name $_ -ProviderName chocolatey -Force
 }
 
 Write-Progress -Activity "Setting git identity"
-$userName = (Get-WmiObject Win32_Process -Filter "Handle = $Pid").GetRelated("Win32_LogonSession").GetRelated("Win32_UserAccount").FullName
+#$userName = (Get-WmiObject Win32_Process -Filter "Handle = $Pid").GetRelated("Win32_LogonSession").GetRelated("Win32_UserAccount").FullName
 Write-Verbose "Setting git user.name to $GitUserName"
 git config --global user.name $GitUserName
 # This seems to the be MSA that was first used during Windows setup
-$userEmail = (Get-WmiObject -Class Win32_ComputerSystem).PrimaryOwnerName
+#$userEmail = (Get-WmiObject -Class Win32_ComputerSystem).PrimaryOwnerName
 Write-Verbose "Setting git user.email to $GitUserEmail"
 git config --global user.email $GitUserEmail
 
@@ -102,7 +103,7 @@ if ((Get-ItemProperty HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\A
 }
 
 Write-Progress "Setting Power Option to High performance"
-$preferredPowerPlan "High performance"
+$preferredPowerPlan = "High performance"
 $planList = powercfg.exe -l
 $planRegEx = "(?<PlanGUID>[A-Fa-f0-9]{8}-(?:[A-Fa-f0-9]{4}\-){3}[A-Fa-f0-9]{12})" + ("(?:\s+\({0}\))" -f $preferredPowerPlan)
 
