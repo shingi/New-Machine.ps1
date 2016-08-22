@@ -40,7 +40,6 @@ if (-not ((Get-PackageSource -Name chocolatey).IsTrusted)) {
     "git.install",
     "fiddler4",
     "Jump-Location",
-    "slack",
     "gitextensions",
     "git-credential-manager-for-windows",
     "7zip"
@@ -50,11 +49,8 @@ if (-not ((Get-PackageSource -Name chocolatey).IsTrusted)) {
 }
 
 Write-Progress -Activity "Setting git identity"
-#$userName = (Get-WmiObject Win32_Process -Filter "Handle = $Pid").GetRelated("Win32_LogonSession").GetRelated("Win32_UserAccount").FullName
 Write-Verbose "Setting git user.name to $GitUserName"
 git config --global user.name $GitUserName
-# This seems to the be MSA that was first used during Windows setup
-#$userEmail = (Get-WmiObject -Class Win32_ComputerSystem).PrimaryOwnerName
 Write-Verbose "Setting git user.email to $GitUserEmail"
 git config --global user.email $GitUserEmail
 
@@ -74,11 +70,6 @@ if ((& git config credential.helper) -ne "manager") {
     Write-Warning "Git Credential Manager for Windows is missing. Install it manually from https://github.com/Microsoft/Git-Credential-Manager-for-Windows/releases"
 }
 
-Write-Progress -Activity "Setting PS aliases"
-if ((Get-Alias -Name st -ErrorAction SilentlyContinue) -eq $null) {
-    Add-Content $PROFILE "`r`n`r`nSet-Alias -Name st -Value (Join-Path `$env:ProgramFiles 'Sublime Text 3\sublime_text.exe')"
-}
-
 Write-Progress -Activity "Enabling Office smileys"
 if (Test-Path HKCU:\Software\Microsoft\Office\16.0) {
     if (-not (Test-Path HKCU:\Software\Microsoft\Office\16.0\Common\Feedback)) {
@@ -88,12 +79,6 @@ if (Test-Path HKCU:\Software\Microsoft\Office\16.0) {
 }
 else {
     Write-Warning "Couldn't find a compatible install of Office"
-}
-
-Write-Progress "Hiding desktop icons"
-if ((Get-ItemProperty HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\).HideIcons -ne 1) {
-    Set-ItemProperty HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\ -Name HideIcons -Value 1
-    Get-Process explorer | Stop-Process
 }
 
 Write-Progress "Enabling PowerShell on Win+X"
