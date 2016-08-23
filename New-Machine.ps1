@@ -42,7 +42,10 @@ if (-not ((Get-PackageSource -Name chocolatey).IsTrusted)) {
     "Jump-Location",
     "gitextensions",
     "git-credential-manager-for-windows",
-    "7zip"
+    "7zip",
+    "keepass",
+    "foxitreader",
+    "visualstudiocode"
 ) | % {
     Write-Progress -Activity "Installing $_"
     Install-Package -Name $_ -ProviderName chocolatey -Force
